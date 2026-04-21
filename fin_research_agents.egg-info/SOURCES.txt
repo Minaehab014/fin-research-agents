@@ -1,0 +1,6 @@
+pyproject.toml
+fin_research_agents.egg-info/PKG-INFO
+fin_research_agents.egg-info/SOURCES.txt
+fin_research_agents.egg-info/dependency_links.txt
+fin_research_agents.egg-info/requires.txt
+fin_research_agents.egg-info/top_level.txt
