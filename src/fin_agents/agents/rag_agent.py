@@ -3,6 +3,7 @@ from rich.console import Console
 from langchain_core.messages import HumanMessage
 from fin_agents.agents.state import ResearchState
 from fin_agents.rag.retriever import retrieve
+from fin_agents.rag.ingest import ingest_ticker, _collection
 from fin_agents.config import groq_llm
 
 console = Console()
@@ -23,6 +24,14 @@ async def run_rag(state: ResearchState) -> dict:
     ticker = state["ticker"]
     query = state["query"]
     console.print(f"[bold cyan]⟳ rag_agent[/bold cyan]  {ticker}")
+
+    # Auto-ingest if this ticker has no chunks yet
+    col = _collection()
+    existing = col.get(where={"ticker": ticker.upper()}, limit=1)
+    if not existing["ids"]:
+        console.print(f"[cyan]  rag_agent[/cyan]  {ticker} not in DB — ingesting now...")
+        n = ingest_ticker(ticker)
+        console.print(f"[cyan]  rag_agent[/cyan]  {ticker} ingested {n} chunks")
 
     # Generate sub-queries
     response = await _llm.ainvoke(
