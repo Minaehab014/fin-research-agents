@@ -29,8 +29,27 @@ def _chunk_id(ticker: str, filing_date: str, chunk_index: int) -> str:
     return hashlib.sha256(key.encode()).hexdigest()[:16]
 
 
-def ingest_ticker(ticker: str) -> int:
-    """Fetch, chunk, and upsert the latest 10-K/10-Q for one ticker. Returns chunk count."""
+def delete_ticker(ticker: str) -> int:
+    """Delete all chunks for a ticker from the collection. Returns deleted count."""
+    col = _collection()
+    existing = col.get(where={"ticker": ticker.upper()})
+    ids = existing["ids"]
+    if ids:
+        col.delete(ids=ids)
+    return len(ids)
+
+
+def ingest_ticker(ticker: str, refresh: bool = False) -> int:
+    """Fetch, chunk, and upsert the latest 10-K/10-Q for one ticker. Returns chunk count.
+
+    Args:
+        refresh: If True, delete all existing chunks for this ticker before ingesting.
+    """
+    if refresh:
+        deleted = delete_ticker(ticker)
+        if deleted:
+            print(f"  Cleared {deleted} existing chunks for {ticker.upper()}")
+
     filing = latest_filing(ticker)
     chunks = _splitter.split_text(filing.text)
     col = _collection()
