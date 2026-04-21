@@ -29,7 +29,7 @@ async def run_news(state: ResearchState) -> dict:
     query = state.get("query", ticker)
     console.print(f"[bold cyan]⟳ news_agent[/bold cyan]  {ticker}")
 
-    items: list[NewsItem] = get_news(f"{ticker} {query}", limit=5)
+    items: list[NewsItem] = get_news(ticker, limit=5)
     if not items:
         console.print(f"[cyan]✓ news_agent[/cyan]  {ticker}  no articles found")
         return {"news": [], "news_summary": "No recent news found."}

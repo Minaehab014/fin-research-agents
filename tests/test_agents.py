@@ -51,5 +51,19 @@ if __name__ == "__main__":
     import os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
     load_dotenv()
-    state = asyncio.run(_run("Analyze Apple's latest quarter"))
-    print(state.get("final_report", ""))
+
+    # python tests/test_agents.py --ingest TSLA NVDA   → ingest tickers (one-time per ticker)
+    # python tests/test_agents.py "query"              → run analysis
+    if len(sys.argv) > 1 and sys.argv[1] == "--ingest":
+        from fin_agents.rag.ingest import ingest_ticker
+        tickers = sys.argv[2:]
+        if not tickers:
+            print("Usage: python tests/test_agents.py --ingest TICKER [TICKER ...]")
+        for t in tickers:
+            print(f"Ingesting {t}...")
+            n = ingest_ticker(t)
+            print(f"  {n} chunks stored for {t}")
+    else:
+        query = sys.argv[1] if len(sys.argv) > 1 else "Is Tesla a good buy right now"
+        state = asyncio.run(_run(query))
+        print(state.get("final_report", ""))
