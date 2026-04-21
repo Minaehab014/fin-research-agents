@@ -1,6 +1,17 @@
 import os, requests
+from dataclasses import dataclass
 from bs4 import BeautifulSoup
+
 HEADERS = {"User-Agent": os.environ["SEC_USER_AGENT"]}
+
+
+@dataclass
+class Filing:
+    ticker: str
+    filing_type: str
+    filing_date: str
+    text: str
+
 
 def ticker_to_cik(ticker: str) -> str:
     r = requests.get("https://www.sec.gov/files/company_tickers.json",
@@ -10,7 +21,8 @@ def ticker_to_cik(ticker: str) -> str:
             return str(row["cik_str"]).zfill(10)
     raise ValueError(f"CIK not found for {ticker}")
 
-def latest_10k_text(ticker: str) -> str:
+
+def latest_filing(ticker: str) -> Filing:
     cik = ticker_to_cik(ticker)
     subs = requests.get(
         f"https://data.sec.gov/submissions/CIK{cik}.json",
@@ -20,6 +32,14 @@ def latest_10k_text(ticker: str) -> str:
         if form in ("10-K", "10-Q"):
             acc = forms["accessionNumber"][i].replace("-", "")
             doc = forms["primaryDocument"][i]
+            filing_date = forms["filingDate"][i]
             url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{acc}/{doc}"
             html = requests.get(url, headers=HEADERS, timeout=30).text
-            return BeautifulSoup(html, "html.parser").get_t
+            text = BeautifulSoup(html, "html.parser").get_text(separator=" ", strip=True)
+            return Filing(
+                ticker=ticker.upper(),
+                filing_type=form,
+                filing_date=filing_date,
+                text=text,
+            )
+    raise ValueError(f"No 10-K or 10-Q found for {ticker}")

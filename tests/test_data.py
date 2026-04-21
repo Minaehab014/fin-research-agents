@@ -1,4 +1,5 @@
 """Integration tests for the data layer — hits real endpoints, no mocks."""
+import sys
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -67,3 +68,49 @@ def test_ticker_to_cik():
     assert isinstance(cik, str)
     assert len(cik) == 10
     assert cik == "0000320193"
+
+
+def test_latest_filing_shape():
+    from fin_agents.data.filings import latest_filing, Filing
+
+    result = latest_filing("AAPL")
+
+    print(f"\n  ticker:       {result.ticker}")
+    print(f"  filing_type:  {result.filing_type}")
+    print(f"  filing_date:  {result.filing_date}")
+    print(f"  text length:  {len(result.text):,} chars")
+    print(f"  text preview: {result.text[:120]!r}")
+
+    assert isinstance(result, Filing)
+    assert result.ticker == "AAPL"
+    assert result.filing_type in ("10-K", "10-Q")
+    assert result.filing_date  # e.g. "2024-11-01"
+    assert len(result.text) > 1000
+
+
+# ---------------------------------------------------------------------------
+# Direct-run entry point
+# ---------------------------------------------------------------------------
+if __name__ == "__main__":
+    import os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+
+    tests = [
+        ("fundamentals", test_get_fundamentals_shape),
+        ("news",         test_get_news_shape),
+        ("ticker_to_cik", test_ticker_to_cik),
+        ("latest_filing", test_latest_filing_shape),
+    ]
+
+    passed = failed = 0
+    for name, fn in tests:
+        try:
+            print(f"\n--- {name} ---")
+            fn()
+            print(f"  PASS")
+            passed += 1
+        except Exception as e:
+            print(f"  FAIL: {e}")
+            failed += 1
+
+    print(f"\nResults: {passed} passed, {failed} failed")
