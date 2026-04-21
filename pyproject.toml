@@ -22,5 +22,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.5", "ipykernel"]
 
+[project.scripts]
+fin-research = "fin_agents.cli:main"
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]

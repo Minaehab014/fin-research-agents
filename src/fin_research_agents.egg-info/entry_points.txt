@@ -1,0 +1,2 @@
+[console_scripts]
+fin-research = fin_agents.cli:main

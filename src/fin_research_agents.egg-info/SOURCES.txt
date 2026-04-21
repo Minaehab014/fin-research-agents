@@ -22,6 +22,7 @@ src/fin_agents/rag/retriever.py
 src/fin_research_agents.egg-info/PKG-INFO
 src/fin_research_agents.egg-info/SOURCES.txt
 src/fin_research_agents.egg-info/dependency_links.txt
+src/fin_research_agents.egg-info/entry_points.txt
 src/fin_research_agents.egg-info/requires.txt
 src/fin_research_agents.egg-info/top_level.txt
 tests/test_agents.py
