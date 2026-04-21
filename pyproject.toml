@@ -24,6 +24,7 @@ dev = ["pytest>=8.0", "ruff>=0.5", "ipykernel"]
 
 [project.scripts]
 fin-research = "fin_agents.cli:main"
+fin-research-mcp = "fin_agents.mcp_server:mcp.run"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

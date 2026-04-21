@@ -1,2 +1,3 @@
 [console_scripts]
 fin-research = fin_agents.cli:main
+fin-research-mcp = fin_agents.mcp_server:mcp.run
