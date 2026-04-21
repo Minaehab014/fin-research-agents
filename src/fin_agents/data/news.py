@@ -8,6 +8,7 @@ class NewsItem(BaseModel):
     published_at: datetime
     source: str
     description: str | None
+    sentiment: str | None = None  # written by news_agent LLM: positive/negative/neutral
 
 def get_news(query: str, limit: int = 5) -> list[NewsItem]:
     r = requests.get(

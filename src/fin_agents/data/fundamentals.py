@@ -11,6 +11,7 @@ class Fundamentals(BaseModel):
     eps: float | None
     revenue_ttm: float | None
     summary: str | None
+    commentary: str | None = None  # written by fundamentals_agent LLM
 
 
 def get_fundamentals(ticker: str) -> Fundamentals:
